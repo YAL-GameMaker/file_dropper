@@ -1,6 +1,6 @@
-# Non-sandboxed filesystem
+# file_dropper
 
-**Quick links:** [itch.io](https://yellowafterlife.itch.io/gamemaker-file-dropper)
+**Quick links:** [itch.io](https://yellowafterlife.itch.io/gamemaker-file-dropper)  
 **Versions:** GameMaker: Studio, GameMaker Studio 2  
 **Platforms:** Windows, Windows (YYC)
 
