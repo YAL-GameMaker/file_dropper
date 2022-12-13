@@ -1,0 +1,15 @@
+file_dropper-for-GMS1/*
+
+file_dropper-for-GMS2/*
+!file_dropper-for-GMS2/assetpackage.yy
+
+file_dropper-for-GMS2.3+/*
+!file_dropper-for-GMS2.3+/file_dropper_23.yyp
+!file_dropper-for-GMS2.3+/metadata.json
+
+*.gmz
+*.gmez
+*.yyz
+*.yymp
+*.yymps
+*.zip

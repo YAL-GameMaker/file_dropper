@@ -1,0 +1,26 @@
+```set template default.html```
+```set title file_dropper cheat sheet```
+```set autoapi ext```
+```set intro
+This is a "cheat sheet" for "file_dropper" extension by YellowAfterlife.
+The extension can be found on [itch.io](https://yellowafterlife.itch.io/gamemaker-file-dropper).
+```
+#[file_dropper_init()->bool]() {
+    Sets up the drag and drop operations for the game window.  
+    Should be called before you expect user to attempt dragging and dropping objects onto the window (usually on Game Start).  
+    Harmless if called more than once.  
+    Returns whether successful (I'm not aware of circumstances that could cause this function to fail).
+    
+    After calling this function above,
+    the game window will indicate to the system that it's happy to accept objects
+    and the user will be able to drag and drop files from Explorer/etc.
+    
+    Doing so will dispatch one Async - System event per file, where
+    
+    --{
+    - `async_load[?"event_type"]` is `"file_drop"`
+    - `async_load[?"filename"]` is an absolute path to the file  
+      Note that in GMS1.4, you'll need an extension to read files outside of game/save directory
+      (e.g. [non-sandboxed filesystem](https://yellowafterlife.itch.io/gamemaker-nsfs))
+    }
+}

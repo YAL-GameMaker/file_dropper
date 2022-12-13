@@ -1,0 +1,15 @@
+.vs/
+*/#backups/*
+*/Configs/*/*
+
+*/extensions/*/*.cpp
+*/extensions/*/*.dll
+*/datafiles/file_dropper.html
+
+*/Debug/
+*/Release/
+Debug/
+Release/
+
+*.sdf
+help.rtf
