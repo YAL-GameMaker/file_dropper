@@ -1,24 +1,37 @@
-# file_dropper
+# Non-sandboxed filesystem
 
-This is a "template" project for creating C++ DLLs for GameMaker!
+**Quick links:** [itch.io](https://yellowafterlife.itch.io/gamemaker-file-dropper)
+**Versions:** GameMaker: Studio, GameMaker Studio 2  
+**Platforms:** Windows, Windows (YYC)
 
-Intended to be copied via [copyre](https://github.com/YAL-Haxe/copyre), like so:
-```
-copyre file_dropper MyExtension file_dropper
-```
-(which copies file_dropper/ to MyExtension/ while changing each occurrence of file_dropper in files/names to MyExtension)
+This extension allows the user to drag-and-drop files and directories onto the game window.
+
+Featuring a total of 1 (one) function:
+
+**file_dropper_init()➜**  
+Sets up the drag and drop operations for the game window.  
+Should be called before you expect user to attempt dragging and dropping objects onto the window (usually on Game Start).  
+Harmless if called more than once.  
+Returns whether successful (I'm not aware of circumstances that could cause this function to fail).
 
 ---
-As part of first-time setup, you'll also want to add
-[GmlCppExtFuncs](https://github.com/YAL-GameMaker-Tools/GmlCppExtFuncs)
-and [GmxGen](https://github.com/YAL-GameMaker-Tools/GmxGen)
-either to your PATH or to the project directory.
 
-These are used as pre-build and post-build steps respectively and are used to streamline the update process - so that you can do
-```
-int64_t my_id = 0;
-dllg int64_t get_id() {
-  return my_id;
-}
-```
-without dealing with GM limitations or manually adding functions to the extension file via UI (see GmlCppExtFuncs documentation for details)
+After calling the said function, the game window will indicate to the system that it's happy to accept objects and the user will be able to drag and drop files from Explorer/etc. Doing so will dispatch one Async - System event per file, where
+
+- `async_load[?"event_type"]` is `"file_drop"`
+- `async_load[?"filename"]` is an absolute path to the file  
+  Note that in GMS1.4, you'll need an extension to read files outside of game/save directory
+  (e.g. [non-sandboxed filesystem](https://yellowafterlife.itch.io/gamemaker-nsfs))
+
+## What's interesting here
+
+A little bit of boilerplate for `RegisterDragDrop` + `IDropTarget`, neither of which is well-documented.
+
+Apparently you can also do this using `DragAcceptFiles`,
+but also [the extension that was using that approach](https://marketplace.yoyogames.com/assets/5265/windows-filedropper)
+doesn't work anymore, so who knows, maybe I dodged a bullet here.
+
+## Meta
+
+**Author:** [YellowAfterlife](https://github.com/YellowAfterlife)  
+**License:** MIT
