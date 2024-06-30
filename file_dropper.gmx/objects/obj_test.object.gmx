@@ -26,29 +26,11 @@
           <argument>
             <kind>1</kind>
             <string>file_dropper_init();
+text = "Dropped files:";
+highlight = false;
+file_dropper_set_default_allow(false);
+//file_dropper_set_default_effect(file_dropper_effect_move);
 </string>
-          </argument>
-        </arguments>
-      </action>
-    </event>
-    <event eventtype="3" enumb="0">
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string></string>
           </argument>
         </arguments>
       </action>
@@ -70,7 +52,32 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>show_debug_message(json_encode(async_load));
+            <string>var _type = async_load[?"event_type"];
+var _tmp = json_decode(json_encode(async_load));
+ds_map_delete(_tmp, "event_type");
+show_debug_message(string(_type) + ": " + json_encode(_tmp));
+ds_map_destroy(_tmp);
+
+switch (async_load[?"event_type"]) {
+    case "file_drag_over":
+        var _x = async_load[?"x"] - window_get_x();
+        var _y = async_load[?"y"] - window_get_y();
+        file_dropper_set_allow(point_in_rectangle(_x, _y,
+            0, 0, window_get_width() div 2, window_get_height()
+        ));
+        break;
+    case "file_drop":
+        text += "#" + async_load[?"filename"];
+        highlight = false;
+        break;
+    case "file_drag_enter":
+        highlight = true;
+        break;
+    case "file_drag_leave":
+    case "file_drop_end":
+        highlight = false;
+        break;
+}
 </string>
           </argument>
         </arguments>
@@ -95,6 +102,12 @@
             <kind>1</kind>
             <string>draw_set_font(fnt_test);
 draw_set_color(c_white);
+
+draw_text(5, 5, text);
+
+if (highlight) {
+    draw_rectangle(3, 3, (room_width div 2) - 3, room_height - 3, true);
+}
 </string>
           </argument>
         </arguments>

@@ -3,24 +3,179 @@
 ```set autoapi ext```
 ```set intro
 This is a "cheat sheet" for "file_dropper" extension by YellowAfterlife.
+
 The extension can be found on [itch.io](https://yellowafterlife.itch.io/gamemaker-file-dropper).
+
+The source code can be found on [GitHub](https://github.com/YAL-GameMaker/file_dropper).
 ```
+```exec
+function auto_event_type() {
+	var st = DocMd.sectionStack;
+	var sl = st.length;
+	var s1 = st[sl - 1];
+	var pl = s1.permalink;
+	return render('`async_load[?"event_type"]` ➜ `"' + pl + '"`');
+}
+```
+```setmd astart
+`async_load` will contain the following fields:
+```
+```setmd aet
+${auto_event_type()}
+```
+```setmd pmk
+	`async_load[?"x"]`, `async_load[?"y"]`\
+	Mouse coordinates (screen-space, like `display_mouse_get_*`)
+-	`async_load[?"key_state"]`\
+	Currently held mouse button and modifier key [flags](file_dropper_mk).
+```
+
 #[file_dropper_init()->bool]() {
-    Sets up the drag and drop operations for the game window.  
-    Should be called before you expect user to attempt dragging and dropping objects onto the window (usually on Game Start).  
-    Harmless if called more than once.  
-    Returns whether successful (I'm not aware of circumstances that could cause this function to fail).
-    
-    After calling this function above,
-    the game window will indicate to the system that it's happy to accept objects
-    and the user will be able to drag and drop files from Explorer/etc.
-    
-    Doing so will dispatch one Async - System event per file, where
-    
-    --{
-    - `async_load[?"event_type"]` is `"file_drop"`
-    - `async_load[?"filename"]` is an absolute path to the file  
-      Note that in GMS1.4, you'll need an extension to read files outside of game/save directory
-      (e.g. [non-sandboxed filesystem](https://yellowafterlife.itch.io/gamemaker-nsfs))
-    }
+	Sets up the drag and drop operations for the game window.
+	
+	Should be called before you expect user to attempt dragging and dropping objects onto the window (usually on Game Start).  
+	Harmless if called more than once.
+	
+	Returns whether successful (I'm not aware of circumstances that could cause this function to fail).
+	
+	After calling this function above,
+	the game window will indicate to the system that it's happy to accept objects
+	and the user will be able to drag and drop files/folders from Explorer/etc.
+	
+	Doing so will dispatch one async events (see below).
+	
+	For basic functionality, you only have to handle the [file_drop] events.
+}
+#[Async events](async) {
+	Drag:
+	#[file_drag_enter]() {
+		Dispatches when the mouse enters the game window
+		while dragging one or more files.
+		
+		This will set effect and permission to drop to defaults
+		([file_dropper_set_default_effect], [file_dropper_set_default_allow]).
+		
+		%[astart]
+		--{
+		-	%[aet]
+		-	%[pmk]
+		}
+	}
+	#[file_drag_over]() {
+		Repeatedly dispatches as the mouse is over the window while dragging files.
+		
+		You can take this opportunity to call [file_dropper_set_allow]
+		and/or [file_dropper_set_effect]
+		to indicate to the user whether they can drop a file at this specific spot
+		and what would happen if they did.
+		
+		%[astart]
+		--{
+		-	%[aet]
+		-	%[pmk]
+		}
+	}
+	#[file_drag_leave]() {
+		Dispatches when the mouse subsequently leaves the game window
+		without dropping anything off.
+		
+		%[astart]
+		--{
+		-	%[aet]
+		}
+	}
+	Drop:
+	#[file_drop_start]() {
+		Dispatches at the beginning of a drop operation.
+		
+		%[astart]
+		--{
+		-	%[aet]
+		-	%[pmk]\
+			Note that mouse button flags are no longer set at this point
+			(likely because drop happens on mouse release).
+		-	`async_load[?"file_count"]`\
+			The number of files that are being dropped off.
+		}
+	}
+	#[file_drop]() {
+		Dispatches once for each file in the batch.
+		
+		%[astart]
+		--{
+		-	%[aet]
+		-	%[pmk]
+		-	`async_load[?"file_count"]`\
+			An _absolute_ path to the file.\
+			Note that in GMS1.4, you'll need an extension to read files outside of game/save directory
+			(e.g. [non-sandboxed filesystem](https://yellowafterlife.itch.io/gamemaker-nsfs))
+		}
+	}
+	#[file_drop_end]() {
+		Dispatches at the end of a drop operation.
+		
+		If you are displaying a "drop zone", 
+		
+		%[astart]
+		--{
+		-	%[aet]
+		-	%[pmk]
+		-	`async_load[?"file_count"]`\
+			The number of files that have been dropped off.
+		}
+	}
+	Misc:
+	#[Mouse/modifier constants](file_dropper_mk) {
+		In the above async events, can be one or more of the following (combined with bit-wise OR):
+		--{
+		-	`file_dropper_mk_lbutton`
+		-	`file_dropper_mk_rbutton`
+		-	`file_dropper_mk_mbutton`
+		-	`file_dropper_mk_shift`
+		-	`file_dropper_mk_control`
+		-	`file_dropper_mk_alt`
+		}
+	}
+}
+#[Extra functions](extra-funcs) {
+	You don't have to use these unless you want more control over the process.
+	#[file_dropper_set_allow(allow_drop)]() {
+		Changes whether the drop operation is currently allowed.
+		
+		You should usually call this in response to [file_drag_over] event.
+	}
+	#[file_dropper_get_allow()->]() {
+		Returns whether the drop operation is currently allowed.
+	}
+	#[file_dropper_set_effect(effect)]() {
+		Changes the effect of the drop operation as displayed to the user: --{
+		-	`file_dropper_effect_none`\
+			A "no" icon
+		-	`file_dropper_effect_copy`
+		-	`file_dropper_effect_move`\
+			Note that this will not automatically remove the original file - that's on you.
+		-	`file_dropper_effect_link`
+		}
+	}
+	#[file_dropper_get_effect()->]() {
+		Returns the current effect of the drop operation as it would be displayed to the user.
+	}
+	
+	The following get/set the state
+	[at the beginning](file_drag_enter) of the drag operation
+	(before GML code has an opportunity to call the above):
+	#[file_dropper_set_default_allow(allow)]() {
+		Changes whether dropping is allowed at the beginning of a drag operation.
+	}
+	#[file_dropper_get_default_allow()->]() {
+		Returns whether dropping is allowed at the beginning of a drag operation.
+	}
+	#[file_dropper_set_default_effect(effect)]() {
+		Changes the drop effect at the beginning of a drag operation.
+		
+		See [file_dropper_set_effect] for accepted values.
+	}
+	#[file_dropper_get_default_effect()->]() {
+		Returns the drop effect at the beginning of a drag operation.
+	}
 }

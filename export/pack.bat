@@ -30,4 +30,15 @@ cmd /C 7z a file_dropper-for-GMS2.3+.zip *
 move /Y file_dropper-for-GMS2.3+.zip ../file_dropper-for-GMS2.3+.yymps
 cd ..
 
+del /Q file_dropper-demo-for-GMS1.zip
+cd ..\file_dropper.gmx
+cmd /C 7z a ..\export\file_dropper-demo-for-GMS1.zip *
+cd ..\export
+cmd /C 7z d file_dropper-demo-for-GMS1.zip Configs
+
+del /Q file_dropper-demo-for-GMS2.3+.zip
+cd ..\file_dropper_23
+cmd /C 7z a ..\export\file_dropper-demo-for-GMS2.3+.zip *
+cd ..\export
+
 pause

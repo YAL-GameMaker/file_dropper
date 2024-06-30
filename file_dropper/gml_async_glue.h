@@ -43,4 +43,9 @@ public:
 	bool set(char* key, const char* value) {
 		return gml_ds_map_set_string(map, key, value);
 	}
+	void setPosKeyState(POINTL pos, DWORD keyState) {
+		set("x", pos.x);
+		set("y", pos.y);
+		set("key_state", keyState);
+	}
 };
