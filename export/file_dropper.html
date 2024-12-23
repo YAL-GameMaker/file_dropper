@@ -254,8 +254,10 @@ body {
 #night:checked + .main {
 	background-color: #424242;
 }
-#night:checked + .main .page {
+#night:checked + .main .page,
+#night:checked + .main .navmenu {
 	background-color: #1c1c1c;
+	border-color: #1c1c1c;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 	color: white;
 }
@@ -395,8 +397,41 @@ Click on sections to expand/collapse them.<br>Quick display controls:
 	</p><p>
 	For basic functionality, you only have to handle the <a href="#file_drop">file_drop</a> events.
 </p></article></section><section><header id="async"><a href="#async" title="(permalink)">Async events</a></header><article><a class="sticky-side" href="#async" title="Async events"><span>Async events</span></a><p>
+	I'm so sorry about the naming of these,
+	people keep asking me to add more events
+	and it's hard to plan ahead.
+	</p><p>
+	These are Async - System events.
+	</p><p>
 	Drag:
-	</p><section><header id="file_drag_enter"><a href="#file_drag_enter" title="(permalink)">file_drag_enter</a></header><article><p>
+	</p><section><header id="file_drag_enter_start"><a href="#file_drag_enter_start" title="(permalink)">file_drag_enter_start</a></header><article><p>
+		Dispatches when the mouse enters the game window
+		while dragging one or more files.
+		</p><p>
+		This one dispatches before the batch of <a href="#file_drag_enter_file">file_drag_enter_file</a> events.
+		</p><p>
+		<code>async_load</code> will contain the following fields:
+		</p><ul>
+		<li>	<code>async_load[?"event_type"]</code> is <code>"file_drag_enter_start"</code>
+		</li><li>	<code>async_load[?"x"]</code>, <code>async_load[?"y"]</code><br/>
+	Mouse coordinates (screen-space, like <code>display_mouse_get_*</code>)
+</li><li>	<code>async_load[?"key_state"]</code><br/>
+	Currently held mouse button and modifier key <a href="#file_dropper_mk">flags</a>.
+		</li></ul></article></section><section><header id="file_drag_enter_file"><a href="#file_drag_enter_file" title="(permalink)">file_drag_enter_file</a></header><article><p>
+		Dispatches for each file when the mouse enters the game window
+		while dragging one or more files.
+		</p><p>
+		<code>async_load</code> will contain the following fields:
+		</p><ul>
+		<li>	<code>async_load[?"event_type"]</code> is <code>"file_drag_enter_file"</code>
+		</li><li>	<code>async_load[?"x"]</code>, <code>async_load[?"y"]</code><br/>
+	Mouse coordinates (screen-space, like <code>display_mouse_get_*</code>)
+</li><li>	<code>async_load[?"key_state"]</code><br/>
+	Currently held mouse button and modifier key <a href="#file_dropper_mk">flags</a>.
+		</li><li>	<code>async_load[?"filename"]</code><br/>
+			An <i>absolute</i> path to the file.<br/>
+			Probably don't start reading it just yet, the user might change their mind.
+		</li></ul></article></section><section><header id="file_drag_enter"><a href="#file_drag_enter" title="(permalink)">file_drag_enter</a></header><article><p>
 		Dispatches when the mouse enters the game window
 		while dragging one or more files.
 		</p><p>
@@ -405,12 +440,15 @@ Click on sections to expand/collapse them.<br>Quick display controls:
 		</p><p>
 		<code>async_load</code> will contain the following fields:
 		</p><ul>
-		<li>	<code>async_load[?"event_type"]</code> ➜ <code>"file_drag_enter"</code>
+		<li>	<code>async_load[?"event_type"]</code> is <code>"file_drag_enter"</code>
 		</li><li>	<code>async_load[?"x"]</code>, <code>async_load[?"y"]</code><br/>
 	Mouse coordinates (screen-space, like <code>display_mouse_get_*</code>)
 </li><li>	<code>async_load[?"key_state"]</code><br/>
 	Currently held mouse button and modifier key <a href="#file_dropper_mk">flags</a>.
-		</li></ul></article></section><section><header id="file_drag_over"><a href="#file_drag_over" title="(permalink)">file_drag_over</a></header><article><p>
+		</li></ul><p>
+		For example, if you want to only allow specific file types,
+		you could do
+	</p></article></section><hr/><section><header id="file_drag_over"><a href="#file_drag_over" title="(permalink)">file_drag_over</a></header><article><p>
 		Repeatedly dispatches as the mouse is over the window while dragging files.
 		</p><p>
 		You can take this opportunity to call <a href="#file_dropper_set_allow">file_dropper_set_allow</a>
@@ -420,7 +458,7 @@ Click on sections to expand/collapse them.<br>Quick display controls:
 		</p><p>
 		<code>async_load</code> will contain the following fields:
 		</p><ul>
-		<li>	<code>async_load[?"event_type"]</code> ➜ <code>"file_drag_over"</code>
+		<li>	<code>async_load[?"event_type"]</code> is <code>"file_drag_over"</code>
 		</li><li>	<code>async_load[?"x"]</code>, <code>async_load[?"y"]</code><br/>
 	Mouse coordinates (screen-space, like <code>display_mouse_get_*</code>)
 </li><li>	<code>async_load[?"key_state"]</code><br/>
@@ -431,7 +469,7 @@ Click on sections to expand/collapse them.<br>Quick display controls:
 		</p><p>
 		<code>async_load</code> will contain the following fields:
 		</p><ul>
-		<li>	<code>async_load[?"event_type"]</code> ➜ <code>"file_drag_leave"</code>
+		<li>	<code>async_load[?"event_type"]</code> is <code>"file_drag_leave"</code>
 		</li></ul></article></section><p>
 	Drop:
 	</p><section><header id="file_drop_start"><a href="#file_drop_start" title="(permalink)">file_drop_start</a></header><article><p>
@@ -439,7 +477,7 @@ Click on sections to expand/collapse them.<br>Quick display controls:
 		</p><p>
 		<code>async_load</code> will contain the following fields:
 		</p><ul>
-		<li>	<code>async_load[?"event_type"]</code> ➜ <code>"file_drop_start"</code>
+		<li>	<code>async_load[?"event_type"]</code> is <code>"file_drop_start"</code>
 		</li><li>	<code>async_load[?"x"]</code>, <code>async_load[?"y"]</code><br/>
 	Mouse coordinates (screen-space, like <code>display_mouse_get_*</code>)
 </li><li>	<code>async_load[?"key_state"]</code><br/>
@@ -453,12 +491,12 @@ Click on sections to expand/collapse them.<br>Quick display controls:
 		</p><p>
 		<code>async_load</code> will contain the following fields:
 		</p><ul>
-		<li>	<code>async_load[?"event_type"]</code> ➜ <code>"file_drop"</code>
+		<li>	<code>async_load[?"event_type"]</code> is <code>"file_drop"</code>
 		</li><li>	<code>async_load[?"x"]</code>, <code>async_load[?"y"]</code><br/>
 	Mouse coordinates (screen-space, like <code>display_mouse_get_*</code>)
 </li><li>	<code>async_load[?"key_state"]</code><br/>
 	Currently held mouse button and modifier key <a href="#file_dropper_mk">flags</a>.
-		</li><li>	<code>async_load[?"file_count"]</code><br/>
+		</li><li>	<code>async_load[?"filename"]</code><br/>
 			An <i>absolute</i> path to the file.<br/>
 			Note that in GMS1.4, you'll need an extension to read files outside of game/save directory
 			(e.g. <a href="https://yellowafterlife.itch.io/gamemaker-nsfs">non-sandboxed filesystem</a>)
@@ -469,7 +507,7 @@ Click on sections to expand/collapse them.<br>Quick display controls:
 		</p><p>
 		<code>async_load</code> will contain the following fields:
 		</p><ul>
-		<li>	<code>async_load[?"event_type"]</code> ➜ <code>"file_drop_end"</code>
+		<li>	<code>async_load[?"event_type"]</code> is <code>"file_drop_end"</code>
 		</li><li>	<code>async_load[?"x"]</code>, <code>async_load[?"y"]</code><br/>
 	Mouse coordinates (screen-space, like <code>display_mouse_get_*</code>)
 </li><li>	<code>async_load[?"key_state"]</code><br/>
@@ -520,7 +558,8 @@ Click on sections to expand/collapse them.<br>Quick display controls:
 	</p></article></section><section><header id="file_dropper_get_default_effect"><a href="#file_dropper_get_default_effect" title="(permalink)">file_dropper_get_default_effect()&#8203;<span class="ret-arrow">&#10140;</span></a></header><article><p>
 		Returns the drop effect at the beginning of a drag operation.
 	</p></article></section></article></section></p><!--doc>-->
-</section></main></div>
+</section>
+</main></div>
 <script type="text/javascript">(function() {
 	var doc, headers;
 	//

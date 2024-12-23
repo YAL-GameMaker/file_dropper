@@ -37,6 +37,9 @@ public:
 	void dispatch(int kind) {
 		gml_event_perform_async(map, kind);
 	}
+	void dispatchSystem() {
+		dispatch(75);
+	}
 	bool set(char* key, double value) {
 		return gml_ds_map_set_double(map, key, value);
 	}

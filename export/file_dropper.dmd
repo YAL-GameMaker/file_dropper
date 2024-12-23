@@ -14,7 +14,7 @@ function auto_event_type() {
 	var sl = st.length;
 	var s1 = st[sl - 1];
 	var pl = s1.permalink;
-	return render('`async_load[?"event_type"]` ➜ `"' + pl + '"`');
+	return render('`async_load[?"event_type"]` is `"' + pl + '"`');
 }
 ```
 ```setmd astart
@@ -47,7 +47,38 @@ ${auto_event_type()}
 	For basic functionality, you only have to handle the [file_drop] events.
 }
 #[Async events](async) {
+	I'm so sorry about the naming of these,
+	people keep asking me to add more events
+	and it's hard to plan ahead.
+	
+	These are Async - System events.
+	
 	Drag:
+	#[file_drag_enter_start]() {
+		Dispatches when the mouse enters the game window
+		while dragging one or more files.
+		
+		This one dispatches before the batch of [file_drag_enter_file] events.
+		
+		%[astart]
+		--{
+		-	%[aet]
+		-	%[pmk]
+		}
+	}
+	#[file_drag_enter_file]() {
+		Dispatches for each file when the mouse enters the game window
+		while dragging one or more files.
+		
+		%[astart]
+		--{
+		-	%[aet]
+		-	%[pmk]
+		-	`async_load[?"filename"]`\
+			An _absolute_ path to the file.\
+			Probably don't start reading it just yet, the user might change their mind.
+		}
+	}
 	#[file_drag_enter]() {
 		Dispatches when the mouse enters the game window
 		while dragging one or more files.
@@ -60,7 +91,11 @@ ${auto_event_type()}
 		-	%[aet]
 		-	%[pmk]
 		}
+		
+		For example, if you want to only allow specific file types,
+		you could do
 	}
+	---
 	#[file_drag_over]() {
 		Repeatedly dispatches as the mouse is over the window while dragging files.
 		
@@ -105,7 +140,7 @@ ${auto_event_type()}
 		--{
 		-	%[aet]
 		-	%[pmk]
-		-	`async_load[?"file_count"]`\
+		-	`async_load[?"filename"]`\
 			An _absolute_ path to the file.\
 			Note that in GMS1.4, you'll need an extension to read files outside of game/save directory
 			(e.g. [non-sandboxed filesystem](https://yellowafterlife.itch.io/gamemaker-nsfs))
